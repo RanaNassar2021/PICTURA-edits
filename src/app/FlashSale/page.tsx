@@ -284,14 +284,13 @@ export default function PicturaWomen() {
                 setOpen(true)
             })
         } else {
-            if (cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == 0 || cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == undefined) {
+            if(cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == 0 || cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == undefined) {
                 const myArray = cookies.Product || [];
                 let updatedArray = [...myArray, addToCart]
                 setState({ ...newState, openTop: true });
                 setOpen(true)
                 setCookie('Product', updatedArray, { path: '/' });
                 console.log(cookies.Product)
-
             } else {
                 return null;
             }

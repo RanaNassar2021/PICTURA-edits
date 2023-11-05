@@ -1,5 +1,6 @@
 'use client';
 import React from "react";
+import { useState } from "react";
 import { Box, Typography, Divider } from "@mui/material";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -16,9 +17,16 @@ import FAQS from '../Assets/StaticData/FAQ.json';
 
 export default function FAQ() {
     const { classes } = useStyles();
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+
+    }
+
     return (
         <React.Fragment>
-            <Header></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
             <Box className={classes.root}>
                 <Box className={classes.container}>
                     <Typography variant="h6">frequently asked questions</Typography>

@@ -65,6 +65,13 @@ export default function Cart() {
     const [cookies, setCookie,removeCookie] = useCookies(["Product"]);
     const [favouriteCookies, setFavouriteCookies] = useCookies(["FavouriteProduct"]);
 
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
+
     useEffect(()=>{
         SetToken(localStorage.getItem("Token"));
       },[localStorage.getItem("Token")])
@@ -115,7 +122,7 @@ export default function Cart() {
             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
         }
         // Make a GET request using axios
-        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetUserCart?PageNumber=1&PageSize=10`, Config);
+        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetUserCart?PageNumber=1&PageSize=10&Location=${currency}`, Config);
         // Update the state with the response data
         setData(response.data);
         let x: any = 0;
@@ -133,10 +140,12 @@ export default function Cart() {
     }, [token]);
 
     useEffect(()=>{
-        setData([]);
+        //setData([]);
         if((token == undefined || token == null) && cookies?.Product?.length!=0){
             cookies?.Product?.map((product:any)=>{
-                if(!!data.filter((item:any)=>item.productId !== product.ProductId)){
+                if (!!data.some((item:any) => {return item.productId === product.ProductId})) {
+                    return;
+                }else{
                     Axios.get(`${process.env.apiUrl}` + `Product/GetProductDetials?Id=${product.ProductId}&ColorId=${product.ColorId}`).then((res)=>{
                         if(res.status=200){
                             setData((prev:any)=>[...prev, {
@@ -152,6 +161,9 @@ export default function Cart() {
                         }
                       });
                 }
+                // if(!!data.filter((item:any)=>item.productId !== product.ProductId)){
+                   
+                // }
             })
         }
     
@@ -255,12 +267,13 @@ export default function Cart() {
         }else
         {
             const myArray = cookies.Product || [];
-            const updatedArray = myArray.filter((item:any)=>(item.ProductId != remove.ProductId && item.ColorId != remove.ColorId));
-            //setData(data.filter((item:any)=>item.ProductId !== remove.ProductId));
+            const updatedArray = myArray.filter((item:any)=>{
+                 return !(item.ProductId === remove.ProductId && item.ColorId === remove.ColorId);
+            });
             setCookie('Product', updatedArray, { path: '/' });
-            setData(data.filter((item: any) => {
-                    return item.productId != remove.ProductId
-            }))
+            setData(data.filter((item:any)=>{
+                return !(item.productId === remove.ProductId && item.colorId === remove.ColorId);
+           }))
         }
     }
 
@@ -330,16 +343,21 @@ export default function Cart() {
 
         })  } else{
             console.log("Else Log");
-            
             if (favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == 0 || favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == undefined) {
                 console.log("Else If Done");
+                // const myArray = cookies.Product || [];
+                // const updatedArray = myArray.filter((item:any)=>(item.ProductId != AddToFavourite.ProductId && item.ColorId != AddToFavourite.ColorId));
+                // setCookie('Product', updatedArray, { path: '/' });
+
                 const myArray = cookies.Product || [];
-                const updatedArray = myArray.filter((item:any)=>(item.ProductId != AddToFavourite.ProductId && item.ColorId != AddToFavourite.ColorId));
-                //setData(data.filter((item:any)=>item.ProductId !== remove.ProductId));
+                const updatedArray = myArray.filter((item:any)=>{
+                    return !(item.ProductId === AddToFavourite.ProductId && item.ColorId === AddToFavourite.ColorId);
+                });
                 setCookie('Product', updatedArray, { path: '/' });
-                // setData(data.filter((item: any) => {
-                //         return item.productId != AddToFavourite.ProductId
-                // }))
+                setData(data.filter((item:any)=>{
+                    return !(item.productId === AddToFavourite.ProductId && item.colorId === AddToFavourite.ColorId);
+                }))
+
                 const myArray2 = favouriteCookies.FavouriteProduct || [];
                 let updatedArray2 = [...myArray2, AddToFavourite]
                 setState({ ...newState, openTop: true });
@@ -395,7 +413,7 @@ export default function Cart() {
 
     return (
         <React.Fragment>
-            <Header></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
 
             {/* stepper Incase of Login */}
 

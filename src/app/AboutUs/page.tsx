@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { Box, Typography, Button } from '@mui/material';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Header from '../Header';
 import Footer from '../Footer';
@@ -12,11 +13,17 @@ import useStyles from './AboutUs.Styles';
 export default function AboutUs() {
 
     const { classes } = useStyles();
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     return (
         <React.Fragment>
             <Box>
-                <Header />
+                <Header sendCurrency={currencyFromHeader}></Header>
             </Box>
             <Box className={classes.container}>
                 <Box className={classes.content}>

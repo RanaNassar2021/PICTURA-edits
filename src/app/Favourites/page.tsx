@@ -29,6 +29,12 @@ export default function Favourites() {
     const [token, SetToken] = useState<any>(localStorage.getItem("Token"));
     const [cookies, setCookie] = useCookies(["Product"]);
     const [favouriteCookies, setFavouriteCookies] = useCookies(["FavouriteProduct"]);
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     useEffect(()=>{
         SetToken(localStorage.getItem("Token"));
@@ -38,7 +44,7 @@ export default function Favourites() {
         const Config = {
             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
         }
-        const response = await Axios.get(`${process.env.apiUrl}` + `Product/FavoriteList?PageNumber=1&PageSize=10&Location=egypt`, Config);
+        const response = await Axios.get(`${process.env.apiUrl}` + `Product/FavoriteList?PageNumber=1&PageSize=10&Location=${currency}`, Config);
         setData(response.data);
         console.log(response.data);
 
@@ -46,7 +52,7 @@ export default function Favourites() {
 
     useEffect(() => {
         !!token &&  fetchData();
-    }, [token]);
+    }, [token, currency]);
     
     useEffect(()=>{
         setData([]);
@@ -67,19 +73,12 @@ export default function Favourites() {
                                 sizes:res.data.sizes,
                                 colorId:product.ColorId
                             }])
-
-                          
-                           
-
                         }
                       });
-
                 }
-               
             })
         }
       
-    
     },[token, favouriteCookies.FavouriteProduct])
 
     //  data.filter((value:any, index:any, self:any) => {
@@ -275,7 +274,7 @@ export default function Favourites() {
 
     return (
         <React.Fragment>
-            <Header></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
             <Box className={classes.container}>
                 <Box className={classes.title}>
                     <Typography variant="h6"> my favourites ({data ? data.length : 0} items) </Typography>

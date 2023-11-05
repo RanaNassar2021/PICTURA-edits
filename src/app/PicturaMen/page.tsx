@@ -72,7 +72,7 @@ export default function PicturaMen() {
     // Call the fetchData function after the initial render
     useEffect(() => {
         fetchData();
-    }, [categoriesId, colorId, isSale, onlyFewLeft, date, prices, isDecending]);
+    }, [categoriesId, colorId, isSale, onlyFewLeft, date, prices, isDecending, currency]);
 
     useEffect(() => {
         fetchFilter();

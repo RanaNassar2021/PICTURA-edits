@@ -52,6 +52,12 @@ export default function SignUp() {
     };
 
     const[isPassIncorrect, setIsPassIncorrect] = useState<any>(false);
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     const formik = useFormik({
         initialValues: {
@@ -79,7 +85,7 @@ export default function SignUp() {
     return (
         <React.Fragment>
             <Box>
-                <Header />
+                <Header sendCurrency={currencyFromHeader}></Header>
                 <Box className="flex  flex-col items-center justify-between">
                     <Box className={classes.container}>
                         <Box>

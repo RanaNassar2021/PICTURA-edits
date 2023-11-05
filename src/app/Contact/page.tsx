@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { Box, Typography, Button } from '@mui/material';
+import { useState } from 'react';
 import Header from '../Header';
 import Footer from '../Footer';
 import Image from 'next/image';
@@ -21,9 +22,15 @@ import * as MuiIcons from '@mui/icons-material';
 export default function Contact() {
     const { classes } = useStyles();
     const Icons: any = MuiIcons;
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
     return (
         <React.Fragment>
-            <Header></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
             <Box className={classes.container} style={{ backgroundImage: `url(${contact.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 <Box sx={{ width: '70%' }}>
                     <Typography variant='h6' sx={{ display: 'flex', justifyContent: 'center', color: 'white', fontSize: '35px', fontWeight: 500 }}>PICTURA Contacts</Typography>

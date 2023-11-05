@@ -16,17 +16,23 @@ export default function ProductDetails () {
     const Icons:any = MuiIcons;
     const params = useParams();
     const [data, setData] = useState<any>([]);
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     const fetchData = async () => {
         // Make a GET request using axios
-        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetProductDetials?Id=${params.id.split('/')[0]}&ColorId=${params.id.split('/')[1]}`);
+        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetProductDetials?Id=${params.id.split('/')[0]}&ColorId=${params.id.split('/')[1]}&Location=${currency}`);
         setData(response.data);
     };
 
     useEffect(()=>{
         fetchData();
 
-    },[])
+    },[currency])
 
     return (
         <React.Fragment>

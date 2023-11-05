@@ -11,8 +11,7 @@ import SideBar from './SideBar/SideBar';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import { CookiesProvider, useCookies } from "react-cookie";
-import { useTranslation } from 'next-i18next';
-import { appWithTranslation } from 'next-i18next'
+
 
 //import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
@@ -20,6 +19,7 @@ import { appWithTranslation } from 'next-i18next'
 
 //Axios
 import Axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 
 // material UI icons
@@ -43,14 +43,14 @@ export default function Header(props: any) {
   const [control, setControl] = React.useState<null | HTMLElement>(null);
   const [totalNumber, SetTotalNumber] = useState<number>();
   const [cookies, setCookie, removeCookie] = useCookies(["Product"]);
-  const [favouriteCookies, setFavouriteCookies] = useCookies(["FavouriteProduct"]);
+  const [favouriteCookies, setFavouriteCookies, removeFavouriteCookies] = useCookies(["FavouriteProduct"]);
   const [totalNumberFavourite, SetTotalNumberFavourite] = useState<number>();
 
   const [currency, setCurrency] = useState<any>('Egypt');
   const [curName, setCurName] = useState<string>('EGP');
   const [language, setLanguage] = useState('en');
   const [langName, setLangName] = useState<string>('English');
-  const { t } = useTranslation(localStorage.getItem("Lang") === 'ar' ? "ar" : "ar");
+ 
 
 
   useEffect(() => {
@@ -61,12 +61,13 @@ export default function Header(props: any) {
     props?.sendCurrency(currency)
   },[currency])
 
+
   const handleLanguageChange = (newLanguage: any) => {
     setCurr(null);
     setControl(null);
     if (newLanguage === 'ar') {
       setLanguage("ar");
-      setLangName("Arabic")
+      setLangName("Arabic");
       localStorage.setItem("Lang", "ar");
     } else {
       setLanguage("en");
@@ -164,28 +165,54 @@ export default function Header(props: any) {
     }
   }, [token, totalNumber, totalNumberFavourite])
 
+  const router = useRouter();
+
   const LogOut = () => {
     localStorage.clear();
+    router.push('/');
   }
 
-  // {  useEffect(()=>{
-  //       if(!!token && cookies.Product.length!=0){
-  //         cookies.Product.map((product:any)=>{
-  //           let body = {
-  //             productId: product.ProductId,
-  //             colorId: product.ColorId,
-  //             sizeId: product.SizeId
-  //         }
-  //         const Config = {
-  //             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
-  //         }
-  //           Axios.post(`${process.env.apiUrl}` + `Product/AddCart`, body, Config).then((res) => {
-  //               console.log(res);
-  //           })
-  //         })
-  //         removeCookie("Product");
-  //       }
-  //   },[token, cookies.Product]) }
+   
+  useEffect(()=>{    
+    if(!!token && !!cookies.Product &&cookies.Product.length!=0){
+        cookies.Product.map((product:any)=>{
+          let body = {
+            productId: product.ProductId,
+            colorId: product.ColorId,
+            sizeId: product.SizeId
+        }
+        const Config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
+        }
+          Axios.post(`${process.env.apiUrl}` + `Product/AddCart`, body, Config).then((res) => {
+              console.log(res);
+          })
+        })
+        removeCookie("Product");
+      }
+  },[token, cookies.Product]);
+
+  useEffect(()=>{    
+    if(!!token && !!favouriteCookies.FavouriteProduct && favouriteCookies.FavouriteProduct.length!=0){
+        favouriteCookies.FavouriteProduct.map((favouriteProduct:any)=>{
+        let body = {
+            productId: favouriteProduct.ProductId,
+            colorId: favouriteProduct.ColorId,
+        }
+        const Config = {
+            headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
+        }
+        Axios.post(`${process.env.apiUrl}` + `Product/ChangeFaviorate`, body, Config).then((res) => {
+            console.log(res);
+            if (res.data == "Saved Successfully") {
+
+            } else {
+                console.log("removed");  
+            }
+          })
+        })
+        removeFavouriteCookies("FavouriteProduct")  
+  }},[token, favouriteCookies.FavouriteProduct]);
 
 
   return (
@@ -194,13 +221,13 @@ export default function Header(props: any) {
         <Box className="flex flex-col">
           <Box className={classes.header}>
             <Box className={classes.topHeader}>
-              <Link href="/Contact"><Button className={classes.btn}>{t("Contact")}</Button> </Link>
+              <Link href="/Contact"><Button className={classes.btn}>Contact</Button> </Link>
               <Link href="/AboutUs"> <Button className={classes.btn}>About us</Button> </Link>
               <Button className={classes.btn} aria-controls={openControl ? 'control-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={openControl ? 'true' : undefined}
                 onClick={handleClickControl}>
-               {(selectedCountry=="Egypt"?<Image src={egyptFlag} width={20} alt='flag' style={{ marginRight: 10 }} />:<Image src={KuwFlag} width={20} alt='flag' style={{ marginRight: 10 }} />)} {selectedCountry} {langName}{curName} <Icons.ArrowDropDown />
+               {(selectedCountry=="Egypt"?<Image src={egyptFlag} width={20} alt='flag' style={{ marginRight: 10 }} />:<Image src={KuwFlag} width={20} alt='flag' style={{ marginRight: 10 }} />)} {selectedCountry} {langName} {curName} <Icons.ArrowDropDown />
               </Button>
               <Menu
                 id="control-menu"

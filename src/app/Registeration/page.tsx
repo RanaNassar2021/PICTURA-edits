@@ -100,6 +100,12 @@ export default function SignUp() {
     const [countryData, setCountryData] = useState<any>([]);
     const [selectedCountryId, setSelectedCountryId] = useState<any>(0);
     const[selectedCityId, setSelectedCityId] = useState<any>(0);
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -236,7 +242,7 @@ export default function SignUp() {
         <GoogleOAuthProvider clientId="793088760090-5cjgp4ghjpl879fjor9uf6bd77i5jr0a.apps.googleusercontent.com">
             <React.Fragment>
                 <Box>
-                    <Header />
+                    <Header sendCurrency={currencyFromHeader}></Header>
                     <Box className="flex min-h-screen flex-col items-center justify-between">
                         <Box className={classes.container}>
                             <Box>

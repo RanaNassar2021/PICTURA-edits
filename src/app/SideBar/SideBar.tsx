@@ -13,6 +13,12 @@ export default function SideBar (show: any) {
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const Icons:any = MuiIcons;
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
     const LogOut = () => {
         localStorage.clear();

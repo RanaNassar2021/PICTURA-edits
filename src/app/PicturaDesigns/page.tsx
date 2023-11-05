@@ -1,6 +1,7 @@
 'use client'
 import React from "react";
 import { Box, Typography, Divider, Button } from "@mui/material";
+import { useState } from "react";
 import Header from "../Header";
 import Footer from "../Footer";
 import Image from "next/image";
@@ -15,10 +16,16 @@ import flashSale from '../Assets/Images/BuyNow.png';
 import women from '../Assets/Images/women.jpg';
 
 export default function Pictura() {
-    const { classes } = useStyles()
+    const { classes } = useStyles();
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
     return (
         <React.Fragment>
-            <Header></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
             <Box className={classes.container} sx={{ display: { xs: 'none', md: 'flex' } }}>
                 <Box className={classes.content}>
                     <Link href='/PicturaMen'>

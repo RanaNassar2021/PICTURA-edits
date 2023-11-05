@@ -1,6 +1,7 @@
 'use client'
 import React from "react";
 import { Box, Typography, Divider } from "@mui/material";
+import { useState } from "react";
 import Header from "../Header";
 import Footer from "../Footer";
 
@@ -13,10 +14,17 @@ import useStyles from "./Terms.Styles";
 
 export default function PrivacyPolicy() {
     const { classes } = useStyles();
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
+
     return (
         <React.Fragment>
             <Box>
-                <Header />
+                <Header sendCurrency={currencyFromHeader}></Header>
                 <Box className={classes.root}>
                     <Box className={classes.container}>
                         <Typography variant="h6">Terms & Conditions</Typography>

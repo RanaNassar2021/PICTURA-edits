@@ -36,13 +36,18 @@ export default function CardDetails() {
     const [data, setData] = useState<any>([]);
     const [Images, setImages] = useState<any>([]);
     const [colorIdApi, setColorIdApi] = useState<any>('');
-
     const [value, setValue] = React.useState<number | null>(2);
+    const [currency, setCurrency] = useState<any>('Egypt');
+
+    const currencyFromHeader = (data: any)=>{
+            setCurrency(data);
+           
+    }
 
 
     const fetchData = async () => {
         // Make a GET request using axios
-        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetProductDetials?Id=${params.id.split('/')[0]}&ColorId=${params.id.split('/')[1]}`);
+        const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetProductDetials?Id=${params.id.split('/')[0]}&ColorId=${params.id.split('/')[1]}&Location=${currency}`);
         setData(response.data);
     };
 
@@ -56,7 +61,7 @@ export default function CardDetails() {
     useEffect(() => {
         fetchData();
         fetchImages();
-    }, [])
+    }, [currency])
 
     const ChangeColor = (Id: any) => {
         setColorIdApi(Id);
@@ -195,7 +200,7 @@ export default function CardDetails() {
 
     return (
         <React.Fragment>
-            <Header ></Header>
+            <Header sendCurrency={currencyFromHeader}></Header>
             <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
                 <Box className={classes.mainContainer}>
                     <Box className={classes.contentLeft}>
@@ -234,13 +239,24 @@ export default function CardDetails() {
                                         </Snackbar>
                                     </Box>}
                             </Box>
-                            <Box>
+                            {data.discountPercentage==null? <Box>
+                                <Typography style={{ marginTop: 20 }}>{data.orginalPrice} EGP</Typography>
+                            </Box>:<Box><Box>
+                                <Typography style={{ marginTop: 20 }}>{data.orginalPrice} EGP</Typography>
+                            </Box>  <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography style={{ color: 'red', fontWeight: '600', fontSize: '18px' }}>{data.discountPercentage} discount {data.currentPrice} EGP </Typography>
+                                <Icons.Share />
+                            </Box></Box>}
+
+
+                            {/* <Box>
                                 <Typography style={{ marginTop: 20 }}>{data.orginalPrice} EGP</Typography>
                             </Box>
                             <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Typography style={{ color: 'red', fontWeight: '600', fontSize: '18px' }}>{data.discountPercentage} discount {data.currentPrice} EGP </Typography>
                                 <Icons.Share />
-                            </Box>
+                            </Box> */}
+
                             <Box>
                                 <Typography style={{ fontWeight: '500', marginTop: 20 }}>Design Rate</Typography>
                             </Box>

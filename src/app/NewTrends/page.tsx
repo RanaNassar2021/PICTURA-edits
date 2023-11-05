@@ -77,7 +77,7 @@ export default function PicturaWomen() {
     // Call the fetchData function after the initial render
     useEffect(() => {
         fetchData();
-    }, [categoriesId, colorId, onlyFewLeft, date, prices, isDecending, gender]);
+    }, [categoriesId, colorId, onlyFewLeft, date, prices, isDecending, gender, currency]);
 
     useEffect(()=>{
         fetchFilter();

@@ -5,31 +5,30 @@ import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
-import AlertAddToFav from "@/app/AlertAddToFav/page";
-import AlertRemovedFromFav from "@/app/AlertRemovedFromFav/page";
+import AlertAddToFav from "./AlertAddToFav/page";
+import AlertRemovedFromFav from "./AlertRemovedFromFav/page";
 import ImagesCard from "./Card/page";
 import { CookiesProvider, useCookies } from "react-cookie";
 import LocalMallIcon from '@mui/icons-material/LocalMall';
+
 
 // SSR and TSS
 
 
 
 // Images
-import Designer from './Assets/Images/theDesigner.jpg';
-import Design1 from './Assets/Images/design1.jpg';
-import Design2 from './Assets/Images/design2.jpg';
-import Design3 from './Assets/Images/design3.jpg';
-import flashSaleBanner from './Assets/Images/flashSaleBanner.png';
-import flashSale from './Assets/Images/flashSale.png';
-import buyNow from './Assets/Images/BuyNow.png';
-import newTrendG from './Assets/Images/newTrendG.jpg';
-import newTrendM from './Assets/Images/newTrendM.jpg';
-import tiktok from './Assets/Images/tiktok.jpg';
-import tiktokIcon from './Assets/Images/tiktokb.png';
-import instagram from './Assets/Images/insta.jpg';
-import facebook from './Assets/Images/facebook.jpg';
-import redShirt from './Assets/Images/best4.jpg'
+import Designer from './Assets/Images/theDesigner.jpg'
+const Design1 =require('./Assets/Images/design1.jpg');
+const Design2 =require('./Assets/Images/design2.jpg');
+const Design3 =require('./Assets/Images/design3.jpg');
+const flashSaleBanner =require('./Assets/Images/flashSaleBanner.png');
+const buyNow =require('./Assets/Images/BuyNow.png');
+const newTrendG =require('./Assets/Images/newTrendG.jpg');
+const newTrendM =require('./Assets/Images/newTrendM.jpg');
+const tiktok =require('./Assets/Images/tiktok.jpg');
+const tiktokIcon =require('./Assets/Images/tiktokb.png');
+const instagram =require('./Assets/Images/insta.jpg');
+const facebook =require('./Assets/Images/facebook.jpg');
 
 
 import Image from 'next/image';
@@ -42,7 +41,6 @@ import useStyles from './HomePage.Styles';
 
 
 // static Data
-import bestSellerData from './Assets/StaticData/BestSeller.json';
 import votesData from './Assets/StaticData/Vote.json'
 
 // Slider
@@ -71,20 +69,31 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function Home() {
+
+
+
+export default function Index() {
 
   const Icons: any = MuiIcons;
   const { classes } = useStyles();
 
-  const [data, setData] = useState([]);
   const [cookies, setCookie] = useCookies(["Product"]);
   const [token, SetToken] = useState(localStorage.getItem("Token"));
   const [flashSale, setFlashSale] = useState<any>([]);
   const [bestSeller, setBestSeller] = useState<any>([]);
 
+  const [currency, setCurrency] = useState<any>('Egypt');
+
+  const currencyFromHeader = (data: any)=>{
+          setCurrency(data);
+
+  }
+
   useEffect(() => {
     SetToken(localStorage.getItem("Token"));
   }, [localStorage.getItem("Token")])
+
+
 
   const handleMouseOver = (id: any, index: any) => {
     setBestSeller((prev: any) => prev.map((item: any, indexPrev: any) => {
@@ -222,8 +231,6 @@ export default function Home() {
     }
 
   }
-  console.log(cookies.Product || []);
-
 
   interface AddToFavouriteInrerface {
     ProductId: string;
@@ -260,13 +267,13 @@ export default function Home() {
   // },[])
 
   const fetchFlashSale = async () => {
-    const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetFalshSaleProducts?PageNumber=1&PageSize=10`);
+    const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetFalshSaleProducts?PageNumber=1&PageSize=10&Location=${currency}`);
     const data = response.data
     setFlashSale(data);
   }
 
   const fetchBestSeller = async () => {
-    const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetBestSellerProducts?PageNumber=1&PageSize=16`);
+    const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetBestSellerProducts?PageNumber=1&PageSize=16&Location=${currency}`);
     const data = response.data;
     setBestSeller(data);
 
@@ -275,7 +282,7 @@ export default function Home() {
   useEffect(() => {
     fetchFlashSale();
     fetchBestSeller();
-  }, [])
+  }, [currency])
 
 
 
@@ -321,14 +328,14 @@ export default function Home() {
   return (
 
     <React.Fragment>
-      <Header></Header>
+      <Header sendCurrency={currencyFromHeader}></Header>
       <Box className="flex  flex-col items-center justify-between">
 
         {/* The dsigner & Pictura designs */}
         <Box className={classes.container} sx={{ display: { xs: 'none', md: 'flex' } }}>
           <Box className={classes.theDesigner} style={{ backgroundImage: `url(${Designer.src})`, backgroundSize: 'cover' }}>
             <Box className={classes.designerContent}>
-              <Typography variant='h6'>The designer</Typography>
+              <Typography variant='h6'>The Designer</Typography>
               <Typography>craft your own outfit</Typography>
             </Box>
           </Box>
