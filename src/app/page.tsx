@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, Divider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, } from '@mui/material';
 import Slide from '@mui/material/Slide';
+import { styled } from '@mui/material/styles';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { TransitionProps } from '@mui/material/transitions';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
@@ -72,7 +74,19 @@ const Transition = React.forwardRef(function Transition(
 });
 
 
+// progress bar for vote & Win
 
+const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
+  },
+}));
 
 export default function Index() {
 
@@ -83,6 +97,8 @@ export default function Index() {
   const [token, SetToken] = useState(localStorage.getItem("Token"));
   const [flashSale, setFlashSale] = useState<any>([]);
   const [bestSeller, setBestSeller] = useState<any>([]);
+  const [newTrend, setNewTrend] = useState<any>([]);
+  const [voteAndWin, setVoteAndWin] = useState<any>([]);
 
   const [currency, setCurrency] = useState<any>('Egypt');
 
@@ -262,11 +278,24 @@ export default function Index() {
     })
   }
 
-  // useEffect(()=>{
-  //   Axios.get(`${process.env.apiUrl}` + `Tag/GetFalshSaleProducts?PageNumber=1&PageSize=10`)
-  //   .then((res) => {setFlashSale(res.flashSale)}
-  //   ).catch(err => console.log( 'Error fetching flash Sale data',err))
-  // },[])
+  interface voteAndWinInterface {
+    ProductId: string;
+    ColorId: number;
+  }
+
+  const userVoting = (userVote: voteAndWinInterface) =>{
+ 
+    const Config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
+    }
+    Axios.post(`${process.env.apiUrl}` + `Product/UserVote?productId=${userVote.ProductId}&colorId=${userVote.ColorId}`,Config).then((res) => {
+      console.log("user voted successfully ", res)
+      setUserVote(true);
+      setOpenVote(true);
+    })
+    
+  }
+
 
   const fetchFlashSale = async () => {
     const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetFalshSaleProducts?PageNumber=1&PageSize=10&Location=${currency}`);
@@ -281,9 +310,23 @@ export default function Index() {
 
   }
 
+  const fetchNewTrend = async ()=>{
+    const response = await Axios.get(`${process.env.apiUrl}` + `Tag/GetTrendingProducts?PageNumber=1&PageSize=2&Location=${currency}`);
+    const data = response.data;
+    setNewTrend(data);
+  }
+
+  const fetchVoteAndWin = async () => {
+    const response = await Axios.get(`${process.env.apiUrl}` + `Product/GetAllProductsVoteAndWin`);
+    const data = response.data;
+    setVoteAndWin(data)
+  }
+
   useEffect(() => {
     fetchFlashSale();
     fetchBestSeller();
+    fetchNewTrend();
+    fetchVoteAndWin();
   }, [currency])
 
 
@@ -291,13 +334,19 @@ export default function Index() {
 
 
   const [openVote, setOpenVote] = React.useState(false);
-  const handleClickOpen = () => {
+  const [userVote, setUserVote] = useState<any>(false);
+
+  const handleClickVoteOpen = () => {
     setOpenVote(true);
   };
+  const handleCloseVote = () => {
+    setOpenVote(false)
+  }
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleCloseVoteUser = () => {
+    setOpenVote(false);
+    setUserVote(true)
+  }
 
 
   const [votes, setVotes] = useState(votesData)
@@ -893,20 +942,21 @@ export default function Index() {
       </Box>
       {/* New Trends Section */}
       <Box className={classes.newTrendsContainer} sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <Box className={classes.newTrendsCard}>
+      {newTrend.map((trend: any, index: number)=>{
+        if(index<2){
+        return(
+          <Box className={classes.newTrendsCard}>
+             <Link href={'/cardDetails/' + trend.productId + "/" + trend.colorId}>
           <Card>
             <CardMedia sx={{ height: '100vh' }}
-              image={newTrendG.src}
+              image={trend.images[0]}
               title="product image" />
           </Card>
+          </Link>
         </Box>
-        <Box className={classes.newTrendsCard}>
-          <Card>
-            <CardMedia sx={{ height: '100vh' }}
-              image={newTrendM.src}
-              title="product image" />
-          </Card>
-        </Box>
+        )}
+       })}
+    
         <Box className={classes.newTrendAbs}>
           <Link href="NewTrends">
             <Typography variant='h5'>New Trends</Typography>
@@ -918,82 +968,128 @@ export default function Index() {
       </Box>
       {/* Mobile view */}
       <Box className={classes.newTrendsContainerMobile} sx={{ display: { xs: 'flex', md: 'none' } }}>
-        <Box className={classes.newTrendCardMobile}>
-          <Card>
-            <CardMedia sx={{ width: '300px', height: '50vh' }}
-              image={newTrendM.src}
-              title="product image" />
-          </Card>
-        </Box>
-        <Box className={classes.newTrendCardBtnContainer}>
-          <Typography variant='h6'>New Trends</Typography>
-          <Button className={classes.newTrendBtn}> <Link href="/NewTrends"> Shop Now</Link> </Button>
-        </Box>
-        <Box className={classes.newTrendCardMobile}>
-          <Card>
-            <CardMedia sx={{ width: '300px', height: '50vh' }}
-              image={newTrendG.src}
-              title="product image" />
-          </Card>
-        </Box>
+          {newTrend.map((trend: any, index: number)=>{
+            return(
+              <Box>
+              <Box className={classes.newTrendCardMobile}>
+              <Link href={'/cardDetails/' + trend.productId + "/" + trend.colorId}>
+              <Card key={index}>
+              <CardMedia sx={{ width: '300px', height: '50vh' }}
+                image={trend.images[0]}
+                title="product image" />
+            </Card>
+            </Link>
+            </Box>
+              <Box className={classes.newTrendCardBtnContainer}>
+              <Typography variant='h6'>New Trends</Typography>
+              <Button className={classes.newTrendBtn}> <Link href="/NewTrends"> Shop Now</Link> </Button>
+            </Box>
+            </Box>
+            )
+          })}
       </Box>
 
       {/* vote & win section */}
       <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+
         <Box className={classes.voteContainer} id="VoteWin">
           <Typography variant='h6'>Vote & Win</Typography>
           <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
         </Box>
-        <Box className={classes.voteCardsContainer}>
-          {votes.map(vote => {
+
+        {!!token ? <Box>
+          {!!userVote ? <Box className={classes.voteCardsContainer}>{voteAndWin.map((vote: any, index: number) => {
             return (
-              <Box key={vote.id} className={classes.voteBox} onClick={handleClickOpen}>
-                <Image width={200} height={300} src={vote.image} alt='vote & win first design' onMouseOver={e => handleMouseOverVote(vote.id)} onMouseOut={e => handleMouseOutVote(vote.id)} />
-                {vote.isMouseOver && <Heading />}
+              <Box key={index} className={classes.voteBox} >
+                <Image width={200} height={300} src={vote.image} alt='vote & win designs' onClick={handleClickVoteOpen} />
+                <Box className={classes.userVote}> <Box sx={{ flexGrow: 1 }}>
+                  <Typography sx={{ display: 'flex', justifyContent: 'center', color: 'white' }}>{vote.voteCount} %</Typography>
+                  <br />
+                  <BorderLinearProgress variant="determinate" value={vote.voteCount} />
+                </Box></Box>
+              </Box>
+            )
+          })} </Box> : <Box className={classes.voteCardsContainer}> {voteAndWin.map((vote: any, index: number) => {
+            return (
+              <Box key={index} className={classes.voteBox} >
+                <Image width={200} height={300} src={vote.image} alt='vote & win designs' onClick={()=>{userVoting({ProductId: vote.productId, ColorId: vote.colorId})}} />
               </Box>
             )
           })}
-          <Dialog
-            open={open}
-            TransitionComponent={Transition}
-            keepMounted
-            onClose={handleClose}
-            aria-describedby="alert-dialog-slide-description"
-          >
-            <DialogTitle>{"Vote & Win"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-slide-description">
-                Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>Log In</Button>
-              <Button onClick={handleClose}>Sign Up</Button>
-            </DialogActions>
-          </Dialog>
+            <Dialog
+              open={openVote}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={handleCloseVote}
+              aria-describedby="alert-dialog-slide-description"
+            >
+              <DialogTitle>Thanks for voting , now you can enjoy your discount</DialogTitle>
+              <DialogActions>
+                <Button onClick={handleCloseVoteUser}>close</Button>
+              </DialogActions>
+            </Dialog></Box>}
         </Box>
+          : <Box className={classes.voteCardsContainer}>
+            {voteAndWin.map((vote: any, index: number) => {
+              return (
+                <Box key={index} className={classes.voteBox} onClick={handleClickVoteOpen}>
+                  <Image width={200} height={300} src={vote.image} alt='vote & win designs' onMouseOver={e => handleMouseOverVote(vote.voteId)} onMouseOut={e => handleMouseOutVote(vote.voteId)} />
+                </Box>
+              )
+            })}
+
+            <Dialog
+              open={openVote}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={handleCloseVote}
+              aria-describedby="alert-dialog-slide-description"
+            >
+              <DialogTitle>{"Vote & Win"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                  Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Link href="/LogIn"><Button>Log In</Button></Link>
+                <Link href="/Registeration"><Button>Sign Up</Button></Link>
+              </DialogActions>
+            </Dialog>  </Box>}
       </Box>
 
       {/* Mobile view */}
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-        <Box className={classes.voteMobileContainer}>
-          <Typography variant='h6'>Vote & Win</Typography>
-          <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
-          <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
 
-            {votes.map(vote => {
-              return (
-                <SplideSlide>
-                  <Box key={vote.id}>
-                    <Image width={200} height={300} src={vote.image} alt='vote & win first design' onMouseOver={e => handleMouseOverVote(vote.id)} onMouseOut={e => handleMouseOutVote(vote.id)} />
-                    {vote.isMouseOver && <Heading />}
-                  </Box>
-                </SplideSlide>
-              )
-            })}
-
-          </Splide>
-        </Box>
+          {!!token ?<Box className={classes.voteMobileContainer}>
+                      <Typography variant='h6'>Vote & Win</Typography>
+                      <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
+                      <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
+                      {voteAndWin.map((vote: any, index: number)=>{
+                                   return(
+                                            <SplideSlide>
+                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}}>
+                                                <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
+                                              </Box>
+                                            </SplideSlide>
+                                           )
+                                            })}
+                      </Splide>
+                      </Box>:<Box className={classes.voteMobileContainer}>
+                                <Typography variant='h6'>Vote & Win</Typography>
+                                <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
+                                <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
+                                {voteAndWin.map((vote: any, index: number)=>{
+                                   return(
+                                            <SplideSlide>
+                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}}>
+                                                <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
+                                              </Box>
+                                            </SplideSlide>
+                                           )
+                                            })}
+                                </Splide>
+                              </Box>}
       </Box>
 
       {/* follow on social media */}

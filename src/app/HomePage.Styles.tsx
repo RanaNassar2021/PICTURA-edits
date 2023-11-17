@@ -550,6 +550,7 @@ const useStyles = makeStyles()((theme: any) => {
                 color:'white',
                 fontSize:'40px',
                 fontFamily:'serif',
+                textShadow:'4px 2px gray'
             }
 
         },
@@ -573,8 +574,8 @@ const useStyles = makeStyles()((theme: any) => {
             display:'flex',
             width:'100%',
             flexDirection:'column',
-            marginTop:100,
-            justifyContent:'center'
+            marginTop:30,
+            justifyContent:'center',
         },
         newTrendCardMobile: {
             width:'100%',
@@ -652,6 +653,19 @@ const useStyles = makeStyles()((theme: any) => {
         },
         voteBox:{
             position:'relative',
+            overflow:'hidden',
+            '& img':{
+             height:'250px',
+             overflow:'hidden'
+            }
+        },
+        userVote:{
+            backgroundColor:'#0A183D',
+            position:'absolute',
+            bottom:0,
+            width:'100%',
+            padding:'1ch',
+            color:'white'
         },
         hoverBox:{
             backgroundColor:'#1E2832',
