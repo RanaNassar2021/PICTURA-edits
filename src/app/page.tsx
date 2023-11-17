@@ -1082,13 +1082,31 @@ export default function Index() {
                                 {voteAndWin.map((vote: any, index: number)=>{
                                    return(
                                             <SplideSlide>
-                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}}>
+                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}} onClick={handleClickVoteOpen}>
                                                 <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
                                               </Box>
                                             </SplideSlide>
                                            )
                                             })}
                                 </Splide>
+                                <Dialog
+                                  open={openVote}
+                                  TransitionComponent={Transition}
+                                  keepMounted
+                                  onClose={handleCloseVote}
+                                  aria-describedby="alert-dialog-slide-description"
+                                >
+                                  <DialogTitle>{"Vote & Win"}</DialogTitle>
+                                    <DialogContent>
+                                      <DialogContentText id="alert-dialog-slide-description">
+                                              Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.
+                                      </DialogContentText>
+                                    </DialogContent>
+                                      <DialogActions>
+                                        <Link href="/LogIn"><Button>Log In</Button></Link>
+                                        <Link href="/Registeration"><Button>Sign Up</Button></Link>
+                                      </DialogActions>
+                                      </Dialog> 
                               </Box>}
       </Box>
 
