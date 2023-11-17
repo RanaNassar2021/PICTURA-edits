@@ -1061,53 +1061,84 @@ export default function Index() {
       {/* Mobile view */}
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
 
-          {!!token ?<Box className={classes.voteMobileContainer}>
-                      <Typography variant='h6'>Vote & Win</Typography>
-                      <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
-                      <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
-                      {voteAndWin.map((vote: any, index: number)=>{
-                                   return(
-                                            <SplideSlide>
-                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}}>
-                                                <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
-                                              </Box>
-                                            </SplideSlide>
-                                           )
-                                            })}
-                      </Splide>
-                      </Box>:<Box className={classes.voteMobileContainer}>
-                                <Typography variant='h6'>Vote & Win</Typography>
-                                <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
-                                <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
-                                {voteAndWin.map((vote: any, index: number)=>{
-                                   return(
-                                            <SplideSlide>
-                                              <Box key={index} sx={{height:'250px', overflow:'hidden'}} onClick={handleClickVoteOpen}>
-                                                <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
-                                              </Box>
-                                            </SplideSlide>
-                                           )
-                                            })}
-                                </Splide>
-                                <Dialog
-                                  open={openVote}
-                                  TransitionComponent={Transition}
-                                  keepMounted
-                                  onClose={handleCloseVote}
-                                  aria-describedby="alert-dialog-slide-description"
-                                >
-                                  <DialogTitle>{"Vote & Win"}</DialogTitle>
-                                    <DialogContent>
-                                      <DialogContentText id="alert-dialog-slide-description">
-                                              Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.
-                                      </DialogContentText>
-                                    </DialogContent>
-                                      <DialogActions>
-                                        <Link href="/LogIn"><Button>Log In</Button></Link>
-                                        <Link href="/Registeration"><Button>Sign Up</Button></Link>
-                                      </DialogActions>
-                                      </Dialog> 
-                              </Box>}
+        {!!token ? <Box>{!!userVote ? <Box className={classes.voteMobileContainer}>
+          <Typography variant='h6'>Vote & Win</Typography>
+          <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
+          <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
+            {voteAndWin.map((vote: any, index: number) => {
+              return (
+                <SplideSlide>
+                  <Box key={index} sx={{ height: '250px', overflow: 'hidden' }} onClick={handleClickVoteOpen}>
+                    <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
+                    <Box className={classes.userVote}> <Box sx={{ flexGrow: 1 }}>
+                      <Typography sx={{ display: 'flex', justifyContent: 'center', color: 'white' }}>{vote.voteCount} %</Typography>
+                      <br />
+                      <BorderLinearProgress variant="determinate" value={vote.voteCount} />
+                    </Box></Box>
+                  </Box>
+                </SplideSlide>
+              )
+            })}
+          </Splide>
+        </Box> : <Box className={classes.voteMobileContainer}>
+          <Typography variant='h6'>Vote & Win</Typography>
+          <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
+          <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
+            {voteAndWin.map((vote: any, index: number) => {
+              return (
+                <SplideSlide>
+                  <Box key={index} sx={{ height: '250px', overflow: 'hidden' }}>
+                    <Image width={200} height={300} src={vote.image} alt='vote & win first design' onClick={() => { userVoting({ ProductId: vote.productId, ColorId: vote.colorId }) }} />
+                  </Box>
+                </SplideSlide>
+              )
+            })}
+          </Splide>
+          <Dialog
+              open={openVote}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={handleCloseVote}
+              aria-describedby="alert-dialog-slide-description"
+            >
+              <DialogTitle>Thanks for voting , now you can enjoy your discount</DialogTitle>
+              <DialogActions>
+                <Button onClick={handleCloseVoteUser}>close</Button>
+              </DialogActions>
+            </Dialog>
+        </Box>}</Box> : <Box className={classes.voteMobileContainer}>
+          <Typography variant='h6'>Vote & Win</Typography>
+          <Typography>Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.</Typography>
+          <Splide options={{ type: 'loop', autoWidth: true, perMove: 1, autoplay: false, speed: 3000, pagination: false }} style={{ width: '100%' }}>
+            {voteAndWin.map((vote: any, index: number) => {
+              return (
+                <SplideSlide>
+                  <Box key={index} sx={{ height: '250px', overflow: 'hidden' }} onClick={handleClickVoteOpen}>
+                    <Image width={200} height={300} src={vote.image} alt='vote & win first design' />
+                  </Box>
+                </SplideSlide>
+              )
+            })}
+          </Splide>
+          <Dialog
+            open={openVote}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={handleCloseVote}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            <DialogTitle>{"Vote & Win"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-slide-description">
+                Choose The Best Design And Get A 5% Discount On Your Next Purchase For A Month.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Link href="/LogIn"><Button>Log In</Button></Link>
+              <Link href="/Registeration"><Button>Sign Up</Button></Link>
+            </DialogActions>
+          </Dialog>
+        </Box>}
       </Box>
 
       {/* follow on social media */}
