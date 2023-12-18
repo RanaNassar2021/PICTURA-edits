@@ -14,6 +14,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import AlertAddToFav from "@/app/AlertAddToFav/page";
 import AlertRemovedFromFav from "@/app/AlertRemovedFromFav/page";
+import { useCookies } from "react-cookie";
 
 // styles
 import useStyles from "./PicturaMen.Styles";
@@ -33,7 +34,9 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 export default function PicturaMen() {
     const { classes } = useStyles();
     const Icons: any = MuiIcons;
-
+    const [cookies, setCookie] = useCookies(["Product"]);
+    const [favouriteCookies, setFavouriteCookies] = useCookies(["FavouriteProduct"]);
+    const [token, SetToken] = useState(localStorage.getItem("Token"));
     const [data, setData] = useState<any>([]);
     const [filtersData, setFiltersData] = useState<any>([]);
     const [categoriesId, SetCategoriesId] = useState<any>([]);
@@ -131,23 +134,10 @@ export default function PicturaMen() {
         setPrices(true)
     }
 
+    useEffect(() => {
+        SetToken(localStorage.getItem("Token"));
+    }, [localStorage.getItem("Token")])
 
-
-    {/*  useEffect(()=>{
-        const get = async () => {
-            try {
-                const resp = await Axios.get(`${process.env.apiUrl}`+ `Product/GetAllProduct?gender=male&pageNumber=1&pageSize=5`);
-                setData(resp.data?.forEach((items: any)=>{
-                    items.isMouseOver = false;
-                    items.hoverImage = false;
-                    items.isClicked = false
-                })); console.log(data)
-              
-            } catch (err) {
-                console.error('Error fetching pictura men data', err);
-            }
-        }
-      },[]) */ }
 
     const handleMouseOver = (id: any, index: any) => {
         setData((prev: any) => prev.map((item: any, indexPrev: any) => {
@@ -246,11 +236,24 @@ export default function PicturaMen() {
         const Config = {
             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
         }
-        Axios.post(`${process.env.apiUrl}` + `Product/AddCart`, body, Config).then((res) => {
-            console.log(res);
-            setState({ ...newState, openTop: true });
-            setOpen(true)
-        })
+        if (!!token) {
+            Axios.post(`${process.env.apiUrl}` + `Product/AddCart`, body, Config).then((res) => {
+                console.log(res);
+                setState({ ...newState, openTop: true });
+                setOpen(true)
+            })
+        } else {
+            if (cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == 0 || cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == undefined) {
+                const myArray = cookies.Product || [];
+                let updatedArray = [...myArray, addToCart]
+                setState({ ...newState, openTop: true });
+                setOpen(true)
+                setCookie('Product', updatedArray, { path: '/' });
+    
+            } else {
+                return null;
+            }
+        }
     }
 
     interface AddToFavouriteInrerface {
@@ -266,20 +269,35 @@ export default function PicturaMen() {
         const Config = {
             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
         }
-        Axios.post(`${process.env.apiUrl}` + `Product/ChangeFaviorate`, body, Config).then((res) => {
-            console.log(res);
-            if (res.data == "Saved Successfully") {
+        if (!!token) {
+            Axios.post(`${process.env.apiUrl}` + `Product/ChangeFaviorate`, body, Config).then((res) => {
+                console.log(res);
+                if (res.data == "Saved Successfully") {
+                    setIsFavourite(true);
+                    setStateFav({ ...newState, openTopFav: true });
+                    setOpenFav(true)
+                } else {
+                    console.log("removed")
+                    setIsFavourite(false);
+                    setStateFav({ ...newState, openTopFav: false });
+                    setOpenFav(true)
+                }
+            })
+        } else {
+            if (favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == 0 || favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == undefined) {
+                const myArray = favouriteCookies.FavouriteProduct || [];
+                let updatedArray = [...myArray, AddToFavourite]
+                setState({ ...newState, openTop: true });
+                setOpen(true)
+                setFavouriteCookies('FavouriteProduct', updatedArray, { path: '/' });
                 setIsFavourite(true);
                 setStateFav({ ...newState, openTopFav: true });
                 setOpenFav(true)
-            } else {
-                console.log("removed")
-                setIsFavourite(false);
-                setStateFav({ ...newState, openTopFav: false });
-                setOpenFav(true)
-            }
 
-        })
+            } else {
+                return null;
+            }
+        }
 
     }
 

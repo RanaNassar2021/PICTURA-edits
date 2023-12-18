@@ -14,6 +14,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import AlertAddToFav from "@/app/AlertAddToFav/page";
 import AlertRemovedFromFav from "@/app/AlertRemovedFromFav/page";
+import { useCookies } from "react-cookie";
 
 // styles
 import useStyles from "./PicturaWomen.Styles";
@@ -34,8 +35,9 @@ const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 export default function PicturaMen() {
     const { classes } = useStyles();
     const Icons: any = MuiIcons;
-
-
+    const [cookies, setCookie] = useCookies(["Product"]);
+    const [favouriteCookies, setFavouriteCookies] = useCookies(["FavouriteProduct"]);
+    const [token, SetToken] = useState(localStorage.getItem("Token"));
     const [data, setData] = useState<any>([]);
     const [filtersData, setFiltersData] = useState<any>([]);
     const [categoriesId, SetCategoriesId] = useState<any>([]);
@@ -128,6 +130,9 @@ export default function PicturaMen() {
     }
 
 
+    useEffect(() => {
+        SetToken(localStorage.getItem("Token"));
+    }, [localStorage.getItem("Token")])
 
     const handleMouseOver = (id: any, index: any) => {
         setData((prev: any) => prev.map((item: any, indexPrev: any) => {
@@ -218,19 +223,32 @@ export default function PicturaMen() {
     }
     
     const addToCart = (addToCart:AddToCartInrerface, newState:SnackbarOrigin) =>{
-        let body ={
+        let body = {
             productId: addToCart.ProductId,
             colorId: addToCart.ColorId,
-            sizeId:addToCart.SizeId
+            sizeId: addToCart.SizeId
         }
         const Config = {
             headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
         }
-        Axios.post(`${process.env.apiUrl}` +`Product/AddCart`, body,Config).then((res)=>{
-          console.log(res);
-          setState({ ...newState, openTop: true });
-          setOpen(true)
-        })
+        if (!!token) {
+            Axios.post(`${process.env.apiUrl}` + `Product/AddCart`, body, Config).then((res) => {
+                console.log(res);
+                setState({ ...newState, openTop: true });
+                setOpen(true)
+            })
+        } else {
+            if (cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == 0 || cookies.Product?.filter((item: any) => item.ProductId === addToCart.ProductId).length == undefined) {
+                const myArray = cookies.Product || [];
+                let updatedArray = [...myArray, addToCart]
+                setState({ ...newState, openTop: true });
+                setOpen(true)
+                setCookie('Product', updatedArray, { path: '/' });
+    
+            } else {
+                return null;
+            }
+        }
         }
     
         interface AddToFavouriteInrerface {
@@ -239,26 +257,42 @@ export default function PicturaMen() {
         }
     
         const AddToFavourite = (AddToFavourite: AddToFavouriteInrerface, newState: SnackbarOrigin) =>{
-            let body ={
+            let body = {
                 productId: AddToFavourite.ProductId,
                 colorId: AddToFavourite.ColorId,
             }
             const Config = {
                 headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
             }
-            Axios.post(`${process.env.apiUrl}` +`Product/ChangeFaviorate`, body,Config).then((res)=>{
-                console.log(res);
-                if(res.data=="Saved Successfully"){
+            if (!!token) {
+                Axios.post(`${process.env.apiUrl}` + `Product/ChangeFaviorate`, body, Config).then((res) => {
+                    console.log(res);
+                    if (res.data == "Saved Successfully") {
+                        setIsFavourite(true);
+                        setStateFav({ ...newState, openTopFav: true });
+                        setOpenFav(true)
+                    } else {
+                        console.log("removed")
+                        setIsFavourite(false);
+                        setStateFav({ ...newState, openTopFav: false });
+                        setOpenFav(true)
+                    }
+                })
+            } else {
+                if (favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == 0 || favouriteCookies.FavouriteProduct?.filter((item: any) => item.ProductId === AddToFavourite.ProductId).length == undefined) {
+                    const myArray = favouriteCookies.FavouriteProduct || [];
+                    let updatedArray = [...myArray, AddToFavourite]
+                    setState({ ...newState, openTop: true });
+                    setOpen(true)
+                    setFavouriteCookies('FavouriteProduct', updatedArray, { path: '/' });
                     setIsFavourite(true);
                     setStateFav({ ...newState, openTopFav: true });
                     setOpenFav(true)
-                }else {
-                    setIsFavourite(false);
-                    setStateFav({ ...newState, openTopFav: false });
-                    setOpenFav(true)
+    
+                } else {
+                    return null;
                 }
-               
-             })
+            }
     
         }
 

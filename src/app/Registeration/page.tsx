@@ -207,7 +207,7 @@ export default function SignUp() {
                 console.error('Error making POST request:', error);
               });
            
-            alert(JSON.stringify(values, null, 2));
+          
         },
     });
 
