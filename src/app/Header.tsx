@@ -163,7 +163,7 @@ export default function Header(props: any) {
     if (token != null && token != undefined) {
       SetShow(false);
     }
-  }, [token, totalNumber, totalNumberFavourite])
+  }, [token])
 
   const router = useRouter();
 

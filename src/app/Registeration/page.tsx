@@ -314,7 +314,7 @@ export default function SignUp() {
                                         {validations.map(x => (<li style={{ color: x.isValid ? "green" : "red" }} key={x.id}>{x.content}</li>))}
                                     </ul>
                                     <FormControl fullWidth size='small' className={classes.textField} variant="outlined">
-                                        <InputLabel htmlFor="outlined-adornment-password" >Confirm Password *</InputLabel>
+                                        <InputLabel style={{backgroundColor:'transparent'}}  htmlFor="outlined-adornment-password" >Confirm Password *</InputLabel>
                                         <OutlinedInput
                                             name="confirmPassword"
                                             value={formik.values.confirmPassword}
@@ -336,7 +336,8 @@ export default function SignUp() {
                                                     </IconButton>
                                                 </InputAdornment>
                                             }
-                                            label="Password"
+                                            label="confirmPassword"
+                                            
                                         />
                                     </FormControl>
                                     <p className={classes.passwordError}>{formik.touched.confirmPassword && formik.errors.confirmPassword}</p>
